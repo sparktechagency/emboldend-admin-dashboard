@@ -173,47 +173,51 @@ const Sidebar = () => {
       </div>
 
       {/* Logout Confirmation Modal */}
-      <Modal
+     <Modal
         open={isLogoutModalVisible}
         onOk={handleLogoutOk}
         centered
+        closable={false}
         onCancel={handleLogoutCancel}
-        style={{ textAlign: "center" }}
-        width={300}
+        width={400}
         footer={[
-          <Button
-            className="custom-button"
-            key="back"
-            onClick={handleLogoutCancel}
-            style={{
-              borderColor: "red",
-              fontWeight: "bold",
-              paddingLeft: "30px",
-              paddingRight: "30px",
-              paddingTop: "10px",
-              paddingBottom: "10px",
-            }}
-          >
-            No
-          </Button>,
-          <Button
-            key="submit"
-            type="text"
-            onClick={handleLogout}
-            style={{
-              backgroundColor: "#E8505B",
-              paddingLeft: "30px",
-              paddingRight: "30px",
-              paddingTop: "10px",
-              paddingBottom: "10px",
-              color: "white",
-            }}
-          >
-            Yes
-          </Button>,
+          <div key="footer" style={{ display: 'flex', justifyContent: 'center', gap: '5px', paddingBottom: '20px' }}>
+            <Button
+              className=""
+              key="back"
+              onClick={handleLogoutCancel}
+              style={{
+                borderColor: "#336C79",
+                fontWeight: "bold",
+                paddingLeft: "50px",
+                paddingRight: "50px",
+                paddingTop: "20px",
+                paddingBottom: "20px",
+              }}
+            >
+              No
+            </Button>,
+            <Button
+              key="submit"
+              type="text"
+              onClick={handleLogout}
+              style={{
+                backgroundColor: "#336C79",
+                paddingLeft: "50px",
+                paddingRight: "50px",
+                paddingTop: "20px",
+                paddingBottom: "20px",
+                color: "white",
+              }}
+            >
+              Yes
+            </Button>
+          </div>
         ]}
       >
-        <p className="pt-10 pb-4 text-xl font-bold">Do you want to Logout?</p>
+        <div style={{ textAlign: "center" }}>
+          <p className="pt-5 pb-3 text-xl font-bold">Do you want to Logout?</p>
+        </div>
       </Modal>
     </div>
   );

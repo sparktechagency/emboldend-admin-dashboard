@@ -44,7 +44,7 @@ export default function LoginPage() {
           <div className="w-full max-w-md p-6 mx-auto border rounded-lg border-primary md:p-8">
             <div className="flex flex-col items-center justify-center gap-4">
               <img
-                src={"/icons/dashboard_logo.png"}
+                src={"/icons/dashboard_logoCopy.png"}
                 alt="Ubuntu Bites Logo"
                 className="w-auto h-24"
               />
@@ -94,7 +94,6 @@ export default function LoginPage() {
                 className="w-full"
                 size="large"
                 loading={isLoading}
-                style={{ backgroundColor: "#E8505B", borderColor: "#E8505B" }}
               >
                 Sign in
               </Button>
