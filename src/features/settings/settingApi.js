@@ -1,28 +1,39 @@
-import { baseApi } from "../../apiBaseQuery";
+import { baseApi } from '../../apiBaseQuery';
 
 
-export const offerApi = baseApi.injectEndpoints({
-    endpoints: (builder) => ({
-      changePassword: builder.mutation({
-        query: (data) => ({
-          url: "/auth/change-password",
-          method: "POST",
-          body: data,
-        }),
+export const settingApi = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    getProfile: builder.query({
+      query: () => ({
+        url: "/users/profile",
+        method: "GET",
       }),
-      updateSettings: builder.mutation({
-        query: (data) => ({
-            url: "/setting",
-            method: "PUT",
-            body: data,
-        }),
     }),
 
-    }), 
-  });
-  
 
-  export const {
-        useChangePasswordMutation,
-        useUpdateSettingsMutation
-  } = offerApi;
+    editProfile: builder.mutation({
+      query: (data) => ({
+        url: "/users/profile",
+        method: "PATCH",
+        body: data,
+      }),
+    }),
+
+
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: "/auth/change-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
+  }),
+});
+
+
+export const {
+  useChangePasswordMutation,
+  useGetProfileQuery,
+  useEditProfileMutation
+} = settingApi;

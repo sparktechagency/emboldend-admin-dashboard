@@ -1,6 +1,5 @@
 import React from "react";
 
-import EarningTable from "../../components/EarningTable";
 import InstituteManagementTableHead from "./InstituteManagementTableHead";
 
 const columns = [

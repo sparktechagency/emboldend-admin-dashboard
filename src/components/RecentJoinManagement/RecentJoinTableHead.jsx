@@ -1,54 +1,18 @@
-import { useLocation, useNavigate } from "react-router-dom";
-
+// RecentJoinTableHead.jsx
+import { useState } from 'react';
+import { useGetRecentInstituteQuery } from '../../features/dashboard/dashboardApi';
 import RecentJoinTableBody from "./RecentJoinTableBody";
 
 const RecentJoinTableHead = ({ columns }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const queryParams = new URLSearchParams(location.search);
-  const searchValue = queryParams.get("search") || "";
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data: recentInstiteJoin, isLoading } = useGetRecentInstituteQuery({ page: currentPage, limit: 5 });
+  
+  const institutions = recentInstiteJoin?.data?.data || [];
+  const meta = recentInstiteJoin?.data?.meta || {};
 
-
-
-
-
-  const data = [
-    {
-      id: 1,
-      ownerName: "John joe",
-      email: "example@email.com",
-      phoneNumber: "12345-678901",
-      joiningDate: "01-02-2025",
-      subscription: "No",
-      planRunning: "60",
-      status: "active",
-    },
-    {
-      id: 2,
-      ownerName: "John joe",
-      email: "example@email.com",
-      phoneNumber: "12345-678901",
-      joiningDate: "01-02-2025",
-      subscription: "No",
-      planRunning: "60",
-      status: "active",
-    },
-    {
-      id: 3,
-      ownerName: "John joe",
-      email: "example@email.com",
-      phoneNumber: "12345-678901",
-      joiningDate: "01-02-2025",
-      subscription: "No",
-      planRunning: "60",
-      status: "active",
-    },
-  ]
-
-
-
-
-
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -62,14 +26,51 @@ const RecentJoinTableHead = ({ columns }) => {
 
         {/* Table Body */}
         <div className="border-2 border-opacity-50 rounded-lg bg-surfacePrimary border-primary">
-          {
-            data.map((item, i) => (
-              <RecentJoinTableBody item={item} key={i} />
-            ))
-          }
+          {isLoading ? (
+            <div className="flex items-center justify-center py-10">
+              <p>Loading institutions...</p>
+            </div>
+          ) : institutions.length > 0 ? (
+            <>
+              {institutions.map((item, i) => (
+                <RecentJoinTableBody 
+                  item={{
+                    id: i + 1 + ((currentPage - 1) * 5),
+                    ownerName: item.institutionName,
+                    email: item.email,
+                    phoneNumber: item.phoneNumber,
+                    joiningDate: new Date(item.createdAt).toLocaleDateString("en-GB"),
+                    subscription: "No", // You might want to get this from API
+                    planRunning: "60",   // You might want to get this from API
+                    status: item.status
+                  }} 
+                  key={item._id} 
+                />
+              ))}
+            </>
+          ) : (
+            <div className="flex items-center justify-center py-10">
+              <p>No institutions found</p>
+            </div>
+          )}
         </div>
 
-
+        {/* Pagination */}
+        {meta.totalPage > 1 && (
+          <div className="flex justify-center mt-4">
+            <div className="flex space-x-2">
+              {Array.from({ length: meta.totalPage }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  className={`px-3 py-1 rounded-md ${currentPage === page ? 'bg-primary text-white' : 'bg-gray-200'}`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

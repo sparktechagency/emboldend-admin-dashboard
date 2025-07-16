@@ -23,7 +23,7 @@ export const authApi = baseApi.injectEndpoints({
     // Forgot Password
     forgotPassword: builder.mutation({
       query: (data) => ({
-        url: "/auth/dashboard/forget-password",
+        url: "/auth/forget-password",
         method: "POST",
         body: data,
       }),
@@ -32,7 +32,7 @@ export const authApi = baseApi.injectEndpoints({
     // Reset Password
     resetPassword: builder.mutation({
       query: (data) => ({
-        url: "/auth/dashboard/reset-password",
+        url: "/auth/reset-password",
         method: "POST",
         headers: {
           Authorization: `Bearer ${data.token}`,

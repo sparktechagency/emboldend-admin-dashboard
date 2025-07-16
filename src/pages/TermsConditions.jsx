@@ -1,24 +1,33 @@
-import React, { useState, useRef, useMemo } from "react";
-import JoditEditor from "jodit-react";
 import { Button, message } from "antd";
-import { useUpdateSettingsMutation } from "../features/settings/settingApi";
+import JoditEditor from "jodit-react";
+import React, { useEffect, useMemo, useRef, useState } from "react"; // Added useEffect
 import { useNavigate } from "react-router-dom";
+import { useCreateTermConditionsMutation, useGetTermConditionsQuery } from '../features/Rule/RuleApi';
 
 const TermsConditions = () => {
   const router = useNavigate();
   const editor = useRef(null);
   const [content, setContent] = useState("");
-  
+  console.log(content)
+
   const [isLoading, setIsLoading] = useState(false);
-  const [updateSettings] = useUpdateSettingsMutation();
+  const [createTerms] = useCreateTermConditionsMutation();
+  const { data } = useGetTermConditionsQuery();
+
+  // Add useEffect to set initial content when data is loaded
+  useEffect(() => {
+    if (data?.data?.content) {
+      setContent(data.data.content.replace(/"/g, '').trim());
+    }
+  }, [data]);
 
   // Configuration object for Jodit Editor with memoization
   const config = useMemo(
     () => ({
       readonly: false,
-      placeholder: "Start typing your Terms Conditions...",
+      placeholder: "",
       height: 500,
-      buttons: ['bold', 'italic', 'underline', 'ul', 'ol', 'indent', 'outdent' , 'image'],
+      buttons: ['bold', 'italic', 'underline', 'ul', 'ol', 'indent', 'outdent', 'image'],
       showPlaceholder: true,
       toolbarSticky: false,
       toolbarAdaptive: false
@@ -29,8 +38,7 @@ const TermsConditions = () => {
   const handleSaveTermsConditions = async () => {
     setIsLoading(true);
     try {
-      // Replace with your actual API call
-      const response = await updateSettings({termsOfService:JSON.stringify(content)}).unwrap();
+      const response = await createTerms({ content: JSON.stringify(content), type: "terms" }).unwrap();
       message.success("Privacy Policy Updated Successfully");
     } catch (error) {
       message.error("Failed to update Privacy Policy");
@@ -44,7 +52,7 @@ const TermsConditions = () => {
     <section className="border p-4 rounded-lg mt-10 shadow">
       <div className="">
         <div className="py-3 rounded">
-            <h3 className="text-xl font-medium text-primary pb-5">Terms And Conditions</h3>
+          <h3 className="text-xl font-medium text-primary pb-5">Terms And Conditions</h3>
         </div>
       </div>
 

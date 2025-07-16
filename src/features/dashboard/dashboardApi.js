@@ -2,36 +2,26 @@ import { baseApi } from "../../apiBaseQuery";
 
 export const dashboardApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    allCountAnalysis: builder.query({
-      query: () => "/admin/dashboard/",
+    getTotalRevenue: builder.query({
+      query: () => "/analytics/monthly-revenue",
       providesTags: ["dashboard"],
     }),
 
-    pieChartAnalysis: builder.query({
-      query: (year = 2024) => `/admin/dashboard/pie-chart?year=${year}`,
+    getdashboardStatictics: builder.query({
+      query: () => `/analytics/summary-stats`,
       providesTags: ["dashboard"],
     }),
 
-    orderChartAnalysis: builder.query({
-      query: () => "/admin/dashboard/order-chart",
+    getRecentInstitute: builder.query({
+      query: () => "/analytics/institutions",
       providesTags: ["dashboard"],
     }),
 
-    revinueChartAnalysis: builder.query({
-      query: (year = 2025) => `/admin/dashboard/revenue?year=${year}`,
-      providesTags: ["dashboard"],
-    }),
-    customerMapAnalysis: builder.query({
-      query: () => "/admin/dashboard/customer-map",
-      providesTags: ["dashboard"],
-    }),
   }),
 });
 
 export const {
-  useAllCountAnalysisQuery,
-  usePieChartAnalysisQuery,
-  useOrderChartAnalysisQuery,
-  useRevinueChartAnalysisQuery,
-  useCustomerMapAnalysisQuery,
+  useGetRecentInstituteQuery,
+  useGetTotalRevenueQuery,
+  useGetdashboardStaticticsQuery,
 } = dashboardApi;

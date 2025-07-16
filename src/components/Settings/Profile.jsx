@@ -1,44 +1,44 @@
-import { useState, useEffect } from "react";
-import { Input, Button, Upload, message } from "antd";
 import { EditOutlined, SaveOutlined } from "@ant-design/icons";
+import { Button, Input, Upload, message } from "antd";
+import { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
-// import { useProfileQuery, useUpdateProfileMutation } from "../features/profile/profileApi";
-// import CustomLoading from "../components/CustomLoading";
-// import { baseURL } from "../utils/BaseURL";
+import { useEditProfileMutation, useGetProfileQuery } from '../../features/settings/settingApi';
+import { baseURL } from '../../utils/BaseURL';
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isPhoneReadOnly, setIsPhoneReadOnly] = useState(false);
-  // const { data: user, isLoading, refetch } = useProfileQuery();
+  const [editProfile, { isLoading: updateProfileLoading }] = useEditProfileMutation();
+  const { data: profileData, isLoading, refetch } = useGetProfileQuery();
 
-  // Initialize profile state when user data is fetched
+  // Initialize profile state with default values
   const [profile, setProfile] = useState({
     name: "",
     email: "",
     phone: "",
   });
 
-  // useEffect(() => {
-  //   if (user?.data) {
-  //     setProfile({
-  //       name: user.data.name || "",
-  //       email: user.data.email || "",
-  //       phone: user.data.phone || "",
-  //     });
-
-  //     // Set profile image correctly
-  //     setPreviewImage(
-  //       user.data.image ? `${baseURL}/${user.data.image}` :
-  //       "https://i.ibb.co.com/fYrFP06M/images-1.png"
-  //     );
-  //   }
-  // }, [user]);
-
-  // const [updateProfile, { isLoading: updateLoading }] = useUpdateProfileMutation();
   const [profileImageFile, setProfileImageFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(
     "https://i.ibb.co.com/fYrFP06M/images-1.png"
   );
+
+
+  // Set initial values when profile data is loaded
+  useEffect(() => {
+    if (profileData?.data) {
+      const userData = profileData.data;
+      setProfile({
+        name: userData.name || "",
+        email: userData.email || "",
+        phone: userData.phone || "",
+      });
+
+      if (userData.profileImage) {
+        setPreviewImage(`${baseURL}${userData.profileImage}`);
+      }
+    }
+  }, [profileData]);
 
   const handleFileChange = ({ file }) => {
     if (!isEditing) return;
@@ -65,41 +65,43 @@ const Profile = () => {
     }
 
     if (!phonePattern.test(profile.phone)) {
-      message.error("Please enter a valid phone number");
+      message.error("Please enter a valid phone number (10-15 digits)");
       return;
     }
 
-    const data = { phone: profile.phone, name: profile.name };
     const formData = new FormData();
-    formData.append("data", JSON.stringify(data));
+    formData.append("name", profile.name);
+    formData.append("email", profile.email);
+    formData.append("phone", profile.phone);
+
     if (profileImageFile) {
-      formData.append("image", profileImageFile);
+      formData.append("profileImage", profileImageFile);
     }
 
-    // try {
-      // const result = await updateProfile(formData).unwrap();
-      
-      // Refetch the user profile data to get the updated information
-      // await refetch();
-      
-      // If the API returns the updated user data directly, you can also update the state
-    //   if (result?.data?.image) {
-    //     setPreviewImage(`${baseURL}/${result.data.image}`);
-    //   }
-      
-    //   message.success("Profile updated successfully");
-    //   setIsEditing(false);
-    //   setIsPhoneReadOnly(true);
-    //   setProfileImageFile(null); // Reset the file state after successful update
-    // } catch (error) {
-    //   console.error("API Error:", error);
-    //   message.error(error?.message || "Error updating profile");
-    // }
+    try {
+      const result = await editProfile(formData).unwrap();
+
+      if (result.success) {
+        await refetch();
+        if (result.data?.profileImage) {
+          setPreviewImage(`${baseURL}${result.data.profileImage}`);
+        }
+        message.success("Profile updated successfully");
+        setIsEditing(false);
+        setIsPhoneReadOnly(true);
+        setProfileImageFile(null);
+      } else {
+        message.error(result.message || "Failed to update profile");
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      message.error(error?.data?.message || error?.message || "Error updating profile");
+    }
   };
 
-  // if (isLoading) {
-  //   return <CustomLoading />;
-  // }
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-64">Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col items-start justify-center pt-5">
@@ -168,19 +170,19 @@ const Profile = () => {
           />
         </div>
 
-        <div className="flex justify-end">
-          <Button
-            type="primary"
-            // loading={updateLoading}
-            icon={<SaveOutlined />}
-            className="mt-6 w-[200px] bg-primary"
-            
-            onClick={handleSave}
-            disabled={!isEditing}
-          >
-            Save
-          </Button>
-        </div>
+        {isEditing && (
+          <div className="flex justify-end">
+            <Button
+              type="primary"
+              loading={updateProfileLoading}
+              icon={<SaveOutlined />}
+              className="mt-6 w-[200px] bg-primary"
+              onClick={handleSave}
+            >
+              Save
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,12 +1,15 @@
+import { CloseCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import { useState } from 'react';
-import CustomFilterDropdown from '../../CustomFilterDropdown';
 import OwnerTableHead from './OwnerTableHead';
-import { CloseCircleOutlined } from '@ant-design/icons';
 
 // Main App Component
 export default function OwnerDetailsManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+
+
+
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -61,16 +64,12 @@ export default function OwnerDetailsManagement() {
               </div>
             </div>
           </div>
-          <div className='flex items-center gap-2 w-3/12'>
-            <CustomFilterDropdown />
-            <CustomFilterDropdown />
-          </div>
         </div>
       </div>
 
       <OwnerTableHead columns={columns} />
-
       {/* Ant Design Modal - Styled to match the image */}
+
       <Modal
         title={
           <div className="text-3xl font-bold text-center mb-4">Account Information</div>

@@ -1,47 +1,52 @@
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message } from "antd";
+import { useChangePasswordMutation } from '../../features/settings/settingApi';
 // import toast from "react-hot-toast";
 
 
 const ChangePassword = () => {
   const [form] = Form.useForm();
+  const [changePassword, { isLoading }] = useChangePasswordMutation();
+
 
   const handleChangePassword = async (values) => {
-    // try {
-    //   const trimmedValues = {
-    //     currentPassword: values.currentPassword.trim(),
-    //     newPassword: values.newPassword.trim(),
-    //     confirmPassword: values.confirmPassword.trim(),
-    //   };
+    try {
+      const trimmedValues = {
+        currentPassword: values.currentPassword.trim(),
+        newPassword: values.newPassword.trim(),
+        confirmPassword: values.confirmPassword.trim(),
+      };
 
-    //   // Validate new password and confirm password match
-    //   if (trimmedValues.newPassword !== trimmedValues.confirmPassword) {
-    //     toast.error("New password and confirm password do not match");
-    //     return;
-    //   }
+      // Validate new password and confirm password match
+      if (trimmedValues.newPassword !== trimmedValues.confirmPassword) {
+        toast.error("New password and confirm password do not match");
+        return;
+      }
 
-    //   // Validate new password is different from current password
-    //   if (trimmedValues.currentPassword === trimmedValues.newPassword) {
-    //     toast.error("New password must be different from current password");
-    //     return;
-    //   }
+      // Validate new password is different from current password
+      if (trimmedValues.currentPassword === trimmedValues.newPassword) {
+        message.error("New password must be different from current password");
+        return;
+      }
 
-    //   // Connect to API to update the password
-    //   const result = await changePassword(trimmedValues).unwrap();
+      // Connect to API to update the password
+      const result = await changePassword(trimmedValues).unwrap();
 
-    //   // Show success message and reset form
-    //   toast.success("Password updated successfully!");
-    //   form.resetFields();
-    // } catch (error) {
-    //   // Handle API errors
-    //   if (error.status === 401) {
-    //     toast.error("Current password is incorrect");
-    //   } else if (error.data?.message) {
-    //     toast.error(error.data.message);
-    //   } else {
-    //     toast.error("Failed to update password. Please try again later.");
-    //   }
-    //   console.error("Password update failed:", error);
-    // }
+      console.log(result)
+
+      // Show success message and reset form
+      message.success("Password updated successfully!");
+      form.resetFields();
+    } catch (error) {
+      // Handle API errors
+      if (error.status === 401) {
+        message.error("Current password is incorrect");
+      } else if (error.data?.message) {
+        message.error(error.data.message);
+      } else {
+        message.error("Failed to update password. Please try again later.");
+      }
+      console.error("Password update failed:", error);
+    }
   };
 
   // Password validation rules
@@ -79,7 +84,7 @@ const ChangePassword = () => {
               height: "52px",
               borderRadius: "8px",
             }}
-            // disabled={isLoading}
+          // disabled={isLoading}
           />
         </Form.Item>
 
@@ -98,7 +103,7 @@ const ChangePassword = () => {
               height: "52px",
               borderRadius: "8px",
             }}
-            // disabled={isLoading}
+          // disabled={isLoading}
           />
         </Form.Item>
 
@@ -130,7 +135,7 @@ const ChangePassword = () => {
               height: "52px",
               borderRadius: "8px",
             }}
-            // disabled={isLoading}
+          // disabled={isLoading}
           />
         </Form.Item>
 

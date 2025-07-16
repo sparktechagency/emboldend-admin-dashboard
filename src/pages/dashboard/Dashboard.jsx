@@ -1,6 +1,5 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAllCountAnalysisQuery } from "../../features/dashboard/dashboardApi";
 
 const AnalysisCard = lazy(() => import("../../components/AnalysisCard"));
 const OrderChart = lazy(() => import("../../components/dashboard/OrderChart"));
@@ -8,21 +7,11 @@ const PieCharts = lazy(() => import("../../components/dashboard/PieChart"));
 const Revenue = lazy(() => import("../../components/dashboard/Revenue"));
 
 
-import { Skeleton } from "antd";
 import AdminStatistics from "../../components/dashboard/AdminStatistics";
 import RecentJoinManagement from "../../components/RecentJoinManagement/RecentJoinManagement";
 
 const Dashboard = () => {
-  const {
-    data: allShop,
-    error: queryError,
-    isLoading: queryLoading,
-    isError,
-    status,
-  } = useAllCountAnalysisQuery(undefined, {
-    refetchOnFocus: true,
-    refetchOnReconnect: true,
-  });
+
 
   const navigate = useNavigate();
 
@@ -70,9 +59,7 @@ const Dashboard = () => {
       {/* Revenue and CustomerMap */}
       <div className="flex items-center justify-between gap-10">
         <div className="w-8/12">
-          <Suspense fallback={<Skeleton active />}>
-            <Revenue />
-          </Suspense>
+          <Revenue />
         </div>
 
         <div className="w-4/12">

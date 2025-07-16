@@ -62,7 +62,6 @@ const Routers = () => {
           <Route path="parking-management">
             <Route index element={<ParkingManagement />} />
           </Route>
-        
             <Route path="earning" element={<Earning />} />
             <Route path="profile" element={<UserProfile />} />
             <Route path="notification" element={<Notification />} />

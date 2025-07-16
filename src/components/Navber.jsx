@@ -10,7 +10,7 @@ import {
   useGetNotificationQuery,
   useReadNotificationMutation,
 } from "../features/notification/notification";
-import { useProfileQuery } from "../features/profile/profileApi";
+import { useGetProfileQuery } from '../features/settings/settingApi';
 import { baseURL } from "../utils/BaseURL";
 
 const NotificationPopup = () => {
@@ -21,14 +21,32 @@ const NotificationPopup = () => {
   const socketRef = useRef(null);
   const popupRef = useRef(null);
   const iconRef = useRef(null);
+  const [searchValue, setSearchValue] = useState(""); // Add state for search value
 
-  const { data: profile } = useProfileQuery();
+  const { data: profile } = useGetProfileQuery();
+
+
   const { data: notifications, refetch, isLoading } = useGetNotificationQuery(undefined, {
     refetchOnFocus: true,
     refetchOnReconnect: true,
   });
 
   const [readNotification, { isLoading: updateLoading }] = useReadNotificationMutation();
+
+  // Clear search on page reload/mount
+  useEffect(() => {
+    // Clear search value and URL parameters on component mount (page reload)
+    setSearchValue("");
+    if (path.search && (path.pathname === "/institute-management" || path.pathname === "/earning")) {
+      // Clear the search query from URL on page reload
+      navigate(path.pathname, { replace: true });
+    }
+  }, []); // Empty dependency array means this runs only on mount
+
+  useEffect(() => {
+    // Clear search value when path changes (but not search params)
+    setSearchValue("");
+  }, [path.pathname]);
 
   useEffect(() => {
     socketRef.current = io(baseURL);
@@ -76,16 +94,20 @@ const NotificationPopup = () => {
   }, []);
 
   const handleSearch = (e) => {
-    const searchQuery = encodeURIComponent(e.target.value);
-    if (!e.target.value) {
-      if (path.pathname === "/order") {
-        navigate("/order");
+    const value = e.target.value;
+    setSearchValue(value); // Update the search value state
+
+    if (value === "") {
+      // When input is cleared, remove the search query from URL
+      if (path.pathname === "/institute-management") {
+        navigate("/institute-management");
       } else if (path.pathname === "/earning") {
         navigate("/earning");
       }
     } else {
-      if (path.pathname === "/business-management") {
-        navigate(`/business-management?search=${searchQuery}`);
+      const searchQuery = encodeURIComponent(value);
+      if (path.pathname === "/institute-management") {
+        navigate(`/institute-management?search=${searchQuery}`);
       } else if (path.pathname === "/earning") {
         navigate(`/earning?search=${searchQuery}`);
       }
@@ -141,7 +163,6 @@ const NotificationPopup = () => {
     }
   };
 
-
   const getNotification = [
 
   ]
@@ -153,6 +174,7 @@ const NotificationPopup = () => {
           <Input
             size="large"
             onChange={handleSearch}
+            value={searchValue} // Add value prop to control the input
             placeholder="Please Input your Order Number"
             style={{
               borderColor: "#336C79",
@@ -176,7 +198,7 @@ const NotificationPopup = () => {
             Hello, <b>{profile?.data?.name || "Hello, Sabbir"}</b>
           </span>
           <Avatar
-            src={profile?.data?.image ? `${baseURL}${profile?.data?.image}` : `${"https://i.ibb.co.com/QF3711qv/Frame-2147226793.png"}`}
+            src={profile?.data?.profileImage ? `${baseURL}${profile?.data?.profileImage}` : `${"https://i.ibb.co.com/QF3711qv/Frame-2147226793.png"}`}
             size={30}
           />
         </div>

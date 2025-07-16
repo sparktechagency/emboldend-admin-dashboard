@@ -2,20 +2,6 @@ import { baseApi } from "../../apiBaseQuery";
 
 export const offerApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    profile: builder.query({
-      query: () => "/user/profile",
-      providesTags: ["profie"],
-    }),
-
-    updateProfile: builder.mutation({
-      query: (data) => ({
-        url: "/user/profile",
-        method: "PATCH",
-        body: data,
-      }),
-      invalidatesTags: ["profile"],
-    }),
-
     deleteUser: builder.mutation({
       query: () => ({
         url: "/user/delete",
@@ -27,7 +13,5 @@ export const offerApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useProfileQuery,
-  useUpdateProfileMutation,
   useDeleteUserMutation,
 } = offerApi;
