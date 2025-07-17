@@ -1,4 +1,4 @@
-import { Card, Dropdown, Radio, message } from 'antd';
+import { Card, Dropdown, Radio, Tooltip, message } from 'antd';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { BiChevronDown, BiChevronUp } from 'react-icons/bi';
@@ -63,8 +63,15 @@ const InstituteManagementTableBody = ({ item, refetch }) => {
       {/* Table Row */}
       <div className="grid items-center grid-cols-11 gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap">
         <div className="flex items-center justify-center py-3">{tableItem.id.slice(-6)}</div>
-        <div className="flex items-center justify-center py-3">{tableItem.ownerName}</div>
-        <div className="flex items-center justify-center py-3">{tableItem.email}</div>
+        <div className="flex items-center justify-center py-3">
+          <Tooltip placement="topLeft" title={tableItem.ownerName}>
+            {tableItem.ownerName.length > 10 ? `${tableItem.ownerName.substring(0, 10)}...` : tableItem.ownerName}
+          </Tooltip>
+        </div>
+
+        <div className="flex items-center justify-center py-3"> <Tooltip placement="topLeft" title={tableItem.email}>
+            {tableItem.email.length > 10 ? `${tableItem.email.substring(0, 10)}...` : tableItem.email}
+          </Tooltip></div>
         <div className="flex items-center justify-center py-3">{tableItem.phoneNumber}</div>
         <div className="flex items-center justify-center py-3">{tableItem.totalInstitute}</div>
         <div className="flex items-center justify-center py-3">{tableItem.totalAppUser}</div>

@@ -1,4 +1,4 @@
-import { EditOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Button, Card, Checkbox, Divider, Input, message, Modal, Select, Spin } from 'antd';
 import { useState } from 'react';
 import { useCreateSubscriptionPlanMutation, useDeleteSubscriptionPlanByIDMutation, useGetSubscriptionPlansQuery, useUpdateSubscriptionPlanByIDMutation } from '../../features/SubscriptionPlan/SubscriptionPlanApi';
@@ -13,15 +13,15 @@ const SubscriptionManagement = () => {
   const [planName, setPlanName] = useState('');
   const [pricePerEmployee, setPricePerEmployee] = useState('');
   const [description, setDescription] = useState('');
-  const [billingCycle, setBillingCycle] = useState('MONTH');
-  const [currency, setCurrency] = useState('USD');
+  const [billingCycle, setBillingCycle] = useState('');
+  const [currency, setCurrency] = useState('');
   const [isUnionized, setIsUnionized] = useState(false);
   const [discount, setDiscount] = useState('');
   const [discountValue, setDiscountValue] = useState('');
   const [planFeatures, setPlanFeatures] = useState([]);
 
   // API hooks
-  const { data: subscriptionPlans, isLoading, error } = useGetSubscriptionPlansQuery();
+  const { data: subscriptionPlans, isLoading, error, refetch } = useGetSubscriptionPlansQuery();
   const [updatePlan, { isLoading: isUpdating }] = useUpdateSubscriptionPlanByIDMutation();
   const [deletePlan] = useDeleteSubscriptionPlanByIDMutation();
   const [createPlan, { isLoading: isCreating }] = useCreateSubscriptionPlanMutation();
@@ -89,6 +89,7 @@ const SubscriptionManagement = () => {
 
   const showCreateModal = () => {
     setIsCreateModalVisible(true);
+
   };
 
   const handleCancel = () => {
@@ -102,8 +103,8 @@ const SubscriptionManagement = () => {
     setPlanName('');
     setPricePerEmployee('');
     setDescription('');
-    setBillingCycle('MONTH');
-    setCurrency('USD');
+    setBillingCycle('');
+    setCurrency('');
     setIsUnionized(false);
     setDiscount('');
     setDiscountValue('');
@@ -129,6 +130,7 @@ const SubscriptionManagement = () => {
       }).unwrap();
 
       message.success('Plan updated successfully');
+      refetch();
       setIsModalVisible(false);
       resetForm();
     } catch (error) {
@@ -151,12 +153,13 @@ const SubscriptionManagement = () => {
       };
 
       await createPlan(createData).unwrap();
+      refetch();
 
       message.success('Plan created successfully');
       setIsCreateModalVisible(false);
       resetForm();
     } catch (error) {
-      message.error('Failed to create plan');
+      message.error(error?.data?.message);
       console.error('Create error:', error);
     }
   };
@@ -171,6 +174,7 @@ const SubscriptionManagement = () => {
       onOk: async () => {
         try {
           await deletePlan(planId).unwrap();
+          refetch();
           message.success('Plan deleted successfully');
         } catch (error) {
           message.error('Failed to delete plan');
@@ -196,79 +200,85 @@ const SubscriptionManagement = () => {
     setPlanFeatures(newFeatures);
   };
 
-  if (isLoading) return <div className="flex justify-center items-center h-64"><Spin size="large" /></div>;
+  if (isLoading) return <div className="flex justify-center items-center h-64"><Spin size="small" /></div>;
   if (error) return <div className="text-red-500 text-center">{error?.data?.message}</div>;
 
   return (
-    <div className="p-6 mt-5">
-      {displayPlans.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64">
-          <div className="text-xl text-gray-600 mb-4">No plan available</div>
-          <Button type="primary" onClick={showCreateModal}>
-            Create a Plan
-          </Button>
-        </div>
-      ) : (
-        <div className="max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {displayPlans.map((plan) => (
-              <Card
-                key={plan.id}
-                className="rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
-                extra={
-                  <div className="flex gap-2">
-                    <Button
-                      type="text"
-                      icon={<EditOutlined />}
-                      onClick={() => showModal(plan)}
-                      className="hover:text-blue-500"
-                    />
-                    <Button
-                      type="text"
-                      icon={<MinusOutlined />}
-                      onClick={() => handleDelete(plan.id)}
-                      className="hover:text-red-500"
-                    />
-                  </div>
-                }
-              >
-                <div className="flex flex-col items-center mb-4">
-                  <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 mb-4">
-                    {plan.icon}
-                  </div>
-                  <h3 className="text-teal-600 text-xl font-medium">{plan.name}</h3>
-                </div>
-                <div className="text-center mb-4">
-                  <div className="flex items-center justify-center">
-                    <span className="text-4xl font-bold">{plan.price}</span>
-                    <span className="text-gray-600">/{plan.billingPeriod}</span>
-                  </div>
-                  <p className="text-gray-500 text-sm">{plan.billingInfo}</p>
-                </div>
+    <div className="p-6 mt-5 border">
+      {displayPlans.length < 4 && <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: "10px" }}>
+        <Button type="primary" onClick={showCreateModal}>
+          Create a Plan
+        </Button>
+      </div>}
 
-                <Divider className="my-4" />
-
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start">
-                      <div className="text-green-500 mr-2 mt-1">✓</div>
-                      <span className="text-gray-600">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Button
-                  type="primary"
-                  block
-                  className="h-12"
-                >
-                  Choose Plan
-                </Button>
-              </Card>
-            ))}
+      {
+        displayPlans.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64">
+            <div className="text-xl text-gray-600 mb-4">No plan available</div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+              {displayPlans.map((plan) => (
+                <Card
+                  key={plan.id}
+                  className="rounded-lg w-full h-full shadow-md hover:shadow-lg transition-shadow duration-300"
+                  extra={
+                    <div className="flex gap-2">
+                      <Button
+                        type="text"
+                        icon={<EditOutlined />}
+                        onClick={() => showModal(plan)}
+                        className="hover:text-blue-500"
+                      />
+                      <Button
+                        type="text"
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDelete(plan.id)}
+                        className="hover:text-red-500"
+                      />
+                    </div>
+                  }
+                >
+                  <div className="flex flex-col items-center mb-4">
+                    <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 mb-4">
+                      {plan.icon}
+                    </div>
+                    <h3 className="text-teal-600 text-xl font-medium">{plan.name}</h3>
+                  </div>
+                  <div className="text-center mb-4">
+                    <div className="flex items-center justify-center">
+                      <span className="text-4xl font-bold">{plan.price}</span>
+                      <span className="text-gray-600">/{plan.billingPeriod}</span>
+                    </div>
+                    <p className="text-gray-500 text-sm">{plan.billingInfo}</p>
+                  </div>
+
+                  <Divider className="my-4" />
+
+                  <ul className="space-y-3 mb-8">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-start">
+                        <div className="text-green-500 mr-2 mt-1">✓</div>
+                        <span className="text-gray-600">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* <Button
+                    type="primary"
+                    block
+                    className="h-12"
+                  >
+                    Choose Plan
+                  </Button> */}
+                </Card>
+              ))}
+            </div>
+          </div>
+        )
+      }
+
 
       {/* Edit Plan Modal */}
       <Modal
@@ -292,7 +302,7 @@ const SubscriptionManagement = () => {
       >
         {editingPlan && (
           <div className="flex">
-            <div className="w-1/2 pr-4">
+            <div className="w-full pr-4">
               <div className="mb-4">
                 <label className="block text-gray-700 text-lg font-semibold mb-2">
                   Change Plan Name
@@ -303,6 +313,16 @@ const SubscriptionManagement = () => {
                   placeholder="Enter plan name"
                   className="w-full"
                 />
+              </div>
+
+              <div>
+                <label className="block text-gray-700 text-lg font-semibold mb-2">Is Unionized</label>
+                <Checkbox
+                  checked={isUnionized}
+                  onChange={(e) => setIsUnionized(e.target.checked)}
+                >
+                  {isUnionized ? 'Yes' : 'No'}
+                </Checkbox>
               </div>
 
               <div className="mb-4">
@@ -332,6 +352,20 @@ const SubscriptionManagement = () => {
                 </select>
               </div>
 
+
+              <div>
+                <label className="block text-gray-700 text-lg font-semibold mb-2">Discount</label>
+                <Select
+                  value={discount || undefined}
+                  onChange={setDiscount}
+                  className="w-full"
+                  placeholder="Select discount type"
+                  allowClear
+                >
+                  <Option value="MONTHS_FREE">MONTHS_FREE</Option>
+                </Select>
+              </div>
+
               <div className="mb-4">
                 <label className="block text-gray-700 text-lg font-semibold mb-2">
                   Currency
@@ -356,89 +390,6 @@ const SubscriptionManagement = () => {
                   rows={3}
                 />
               </div>
-
-              <div className="mb-4">
-                <label className="flex items-center text-gray-700 text-lg font-semibold">
-                  <input
-                    type="checkbox"
-                    checked={isUnionized}
-                    onChange={(e) => setIsUnionized(e.target.checked)}
-                    className="mr-2"
-                  />
-                  Unionized Plan
-                </label>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="block text-gray-700 text-lg font-semibold">
-                    Change Display Features
-                  </label>
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={addFeature}
-                    shape="circle"
-                    className=""
-                  />
-                </div>
-                <div className="space-y-3">
-                  {planFeatures.map((feature, index) => (
-                    <div key={index} className="flex items-center">
-                      <Input
-                        value={feature}
-                        onChange={(e) => updateFeature(index, e.target.value)}
-                        className="flex-grow mr-2"
-                      />
-                      <Button
-                        type="default"
-                        icon={<MinusOutlined />}
-                        onClick={() => removeFeature(index)}
-                        shape="circle"
-                        className="flex-shrink-0 hover:text-red-500 hover:border-red-500"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="w-1/2 pl-4">
-              <Card className="border shadow-sm">
-                <div className="flex flex-col items-center mb-4">
-                  <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 mb-4">
-                    {getIconForPlan(planName)}
-                  </div>
-                  <h3 className="text-teal-600 text-xl font-medium">{planName}</h3>
-                </div>
-
-                <div className="text-center mb-4">
-                  <div className="flex items-center justify-center">
-                    <span className="text-4xl font-bold">${pricePerEmployee}</span>
-                    <span className="text-gray-600">/{billingCycle === 'MONTH' ? 'month' : 'year'}</span>
-                  </div>
-                  <p className="text-gray-500 text-sm">
-                    Per employee, billed {billingCycle === 'MONTH' ? 'monthly' : 'annually'}.
-                  </p>
-                </div>
-
-                <ul className="space-y-3 mb-6">
-                  {planFeatures.map((feature, index) => (
-                    <li key={index} className="flex items-start">
-                      <div className="text-green-500 mr-2 mt-1">✓</div>
-                      <span className="text-gray-600">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Button
-                  type="primary"
-                  block
-                  className="h-12"
-                >
-                  Choose Plan
-                </Button>
-              </Card>
             </div>
           </div>
         )}
@@ -468,10 +419,11 @@ const SubscriptionManagement = () => {
           <div>
             <label className="block text-gray-700 text-lg font-semibold mb-2">Plan Name</label>
             <Select
-              value={planName}
+              value={planName || undefined} // Use undefined instead of empty string for placeholder to show
               onChange={setPlanName}
               className="w-full"
               placeholder="Select plan name"
+              allowClear
             >
               <Option value="UNIONIZED_MONTHLY">UNIONIZED_MONTHLY</Option>
               <Option value="UNIONIZED_YEARLY">UNIONIZED_YEARLY</Option>
@@ -493,10 +445,11 @@ const SubscriptionManagement = () => {
           <div>
             <label className="block text-gray-700 text-lg font-semibold mb-2">Billing Cycle</label>
             <Select
-              value={billingCycle}
+              value={billingCycle || undefined}
               onChange={setBillingCycle}
               className="w-full"
               placeholder="Select billing cycle"
+              allowClear
             >
               <Option value="MONTH">Month</Option>
               <Option value="YEAR">Year</Option>
@@ -517,10 +470,11 @@ const SubscriptionManagement = () => {
           <div>
             <label className="block text-gray-700 text-lg font-semibold mb-2">Discount</label>
             <Select
-              value={discount}
+              value={discount || undefined}
               onChange={setDiscount}
               className="w-full"
               placeholder="Select discount type"
+              allowClear
             >
               <Option value="MONTHS_FREE">MONTHS_FREE</Option>
             </Select>
@@ -540,11 +494,12 @@ const SubscriptionManagement = () => {
           <div>
             <label className="block text-gray-700 text-lg font-semibold mb-2">Currency</label>
             <Select
-              value={currency}
+              value={currency || undefined}
               onChange={setCurrency}
               className="w-full"
               placeholder="Select currency"
               showSearch
+              allowClear
               filterOption={(input, option) =>
                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }

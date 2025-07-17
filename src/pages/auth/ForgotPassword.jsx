@@ -1,20 +1,22 @@
-import { Button, Input, Form } from "antd";
+import { Button, Form, Input, message } from "antd";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-import { useForgotPasswordMutation } from "../../features/auth/authApi";
+import { useForgotPasswordMutation } from '../../features/auth/authApi';
 
 export default function ForgotPassword() {
   const route = useNavigate();
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
   const onFinish = async (values) => {
-    // try {
-    //   await forgotPassword(values).unwrap();
-    //   route("/auth/login/check_email");
-    // } catch (error) {
-    //   console.error("OTP verification failed:", error);
-    //   alert("Email does not exist.");
-    // }
+    console.log(values)
+    try {
+      const response = await forgotPassword(values).unwrap();
+      response.success && route(`/auth/signup/checkOtp?email=${values.email}`);
+      console.log(response);
+    } catch (error) {
+      console.error("OTP verification failed:", error);
+      message.error("Email does not exist.");
+    }
   };
 
   return (

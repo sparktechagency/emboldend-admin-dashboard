@@ -1,8 +1,8 @@
-import { Button, Input, Form, message } from "antd";
+import { Button, Form, Input, message } from "antd";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useResetPasswordMutation } from "../../features/auth/authApi";
-import { saveToken } from "../../features/auth/authService";
+import { useResetPasswordMutation } from '../../features/auth/authApi';
+
 
 export default function ResetPasswordPage() {
   const router = useNavigate();
@@ -11,18 +11,25 @@ export default function ResetPasswordPage() {
   const token = params.get('token');
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
+  console.log(token)  // 09996cc1761fb21a217757da56dfa74943a2e146c1742b43e117c4bac7c3c5a6
+
   const onFinish = async (values) => {
+    console.log('Form values:', values);
+    console.log('Token from URL:', token);
+
+    // Token validation
+    if (!token) {
+      message.error("No reset token found in URL");
+      return;
+    }
+
     try {
-      const credentials = {
-        ...values,
-        token: token,
-      };
-      await resetPassword(credentials).unwrap();
-      saveToken(token);
+      await resetPassword({ data: values, token: token }).unwrap();
       router('/auth/success');
     } catch (error) {
       console.error("Password reset failed:", error);
       console.error("Full error response:", error.data);
+      console.error("Error status:", error.status);
       message.error("Password reset failed. Please try again.");
     }
   };
@@ -64,9 +71,9 @@ export default function ResetPasswordPage() {
                 label="Password"
                 rules={[{ required: true, message: "Password is required!" }]}
               >
-                <Input.Password 
-                  placeholder="Enter your password" 
-                  size="large" 
+                <Input.Password
+                  placeholder="Enter your password"
+                  size="large"
                 />
               </Form.Item>
 
@@ -87,9 +94,9 @@ export default function ResetPasswordPage() {
                   }),
                 ]}
               >
-                <Input.Password 
-                  placeholder="Confirm your password" 
-                  size="large" 
+                <Input.Password
+                  placeholder="Confirm your password"
+                  size="large"
                 />
               </Form.Item>
 

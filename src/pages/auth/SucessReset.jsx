@@ -36,23 +36,16 @@ export default function PasswordResetSuccess() {
 
             <div className="mt-6">
               <Button
-                onClick={() => router('/')}
+                onClick={() => router('/auth/login')}
                 type="primary"
                 className="w-full"
                 size="large"
                 loading={loading}
               >
+                <FaArrowLeftLong />
                 Continue
               </Button>
             </div>
-
-            <button
-              onClick={() => router('/auth/login')}
-              className="flex items-center justify-center w-full gap-2 mt-6 text-base text-gray-500 cursor-pointer"
-            >
-              <FaArrowLeftLong />
-              <span>Back to log in</span>
-            </button>
           </div>
         </div>
       </div>

@@ -1,26 +1,25 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Layout from "./layouts/Layout";
-import Dashboard from "./pages/dashboard/Dashboard";
-import NotFound from "./pages/NotFound";
-import Earning from "./pages/earning/Earning";
-import Login from "./pages/auth/SignIn";
-import ForgotPassword from "./pages/auth/ForgotPassword";
-import CheckEmail from "./pages/auth/CheckEmail";
-import SetPassword from "./pages/auth/SetPassword";
-import Verify from "./pages/auth/Verify_user";
-import SuccessReset from "./pages/auth/SucessReset";
-import Notification from "./pages/Notification";
-import PrivacyPolicy from "./pages/privacyPolicy";
-import TermsConditions from "./pages/TermsConditions";
-import UserProfile from "./pages/UserProfile";
-import ProtectedRoute from "./components/ProtectedRoute";
-import UserManagement from "./pages/UserManagement/UserManagement";
-import ParkingManagement from "./pages/ParkingManagement/ParkingManagement";
-import Settings from "./components/Settings/Settings";
-import PushNotification from "./components/PushNotification/PushNotification";
-import SubscriptionManagement from "./components/SubscriptionManagement/SubscriptionManagement";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import InstituteManagement from "./components/InstituteManagement/InstituteManagement";
 import OwnerDetailsManagement from "./components/InstituteManagement/OwnerDetails/OwnerDetailsManagement";
+import PushNotification from "./components/PushNotification/PushNotification";
+import Settings from "./components/Settings/Settings";
+import SubscriptionManagement from "./components/SubscriptionManagement/SubscriptionManagement";
+import Layout from "./layouts/Layout";
+import CheckEmail from "./pages/auth/CheckEmail";
+import ForgotOtp from './pages/auth/ForgotOtp';
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import SetPassword from "./pages/auth/SetPassword";
+import Login from "./pages/auth/SignIn";
+import SuccessReset from "./pages/auth/SucessReset";
+import Dashboard from "./pages/dashboard/Dashboard";
+import Earning from "./pages/earning/Earning";
+import NotFound from "./pages/NotFound";
+import Notification from "./pages/Notification";
+import ParkingManagement from "./pages/ParkingManagement/ParkingManagement";
+import PrivacyPolicy from "./pages/privacyPolicy";
+import TermsConditions from "./pages/TermsConditions";
+import UserManagement from "./pages/UserManagement/UserManagement";
+import UserProfile from "./pages/UserProfile";
 
 const Routers = () => {
   return (
@@ -29,7 +28,7 @@ const Routers = () => {
 
         <Route path="/auth/login" element={<Login />} />
         <Route path="/auth/success" element={<SuccessReset />} />
-        <Route path="/auth/signup/verify" element={<Verify />} />
+        <Route path="/auth/signup/checkOtp" element={<ForgotOtp />} />
         <Route
           path="/auth/login/forgot_password"
           element={<ForgotPassword />}
@@ -42,15 +41,15 @@ const Routers = () => {
           path="/"
           element={
             // <ProtectedRoute>
-              <Layout />
+            <Layout />
             //  </ProtectedRoute>
           }
         >
           <Route index element={<Dashboard />} />
-        <Route path="institute-management">
-  <Route index element={<InstituteManagement />} />
-  <Route path="owner-details/:id" element={<OwnerDetailsManagement />} />
-</Route>
+          <Route path="institute-management">
+            <Route index element={<InstituteManagement />} />
+            <Route path="owner-details/:id" element={<OwnerDetailsManagement />} />
+          </Route>
 
 
 
@@ -62,11 +61,11 @@ const Routers = () => {
           <Route path="parking-management">
             <Route index element={<ParkingManagement />} />
           </Route>
-            <Route path="earning" element={<Earning />} />
-            <Route path="profile" element={<UserProfile />} />
-            <Route path="notification" element={<Notification />} />
-            <Route path="privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="terms-conditions" element={<TermsConditions />} />
+          <Route path="earning" element={<Earning />} />
+          <Route path="profile" element={<UserProfile />} />
+          <Route path="notification" element={<Notification />} />
+          <Route path="privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="terms-conditions" element={<TermsConditions />} />
         </Route>
 
         {/* 404 Not Found Route */}

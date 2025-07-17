@@ -1,3 +1,4 @@
+import { Tooltip } from 'antd';
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { IoCloseOutline } from "react-icons/io5";
@@ -64,10 +65,14 @@ const EarningTableRow = ({ item, isFetching }) => {
           #{item.id}
         </div>
         <div className="flex items-center justify-center py-3" title={item.ownerName}>
-          {truncateText(item.ownerName)}
+          <Tooltip placement="topLeft" title={truncateText(item.ownerName)}>
+            {truncateText(item.ownerName).length > 10 ? `${truncateText(item.ownerName).substring(0, 10)}...` : truncateText(item.ownerName)}
+          </Tooltip>
         </div>
         <div className="flex items-center justify-center py-3" title={item.email}>
-          {truncateText(item.email, 25)}
+          <Tooltip placement="topLeft" title={truncateText(item.email)}>
+            {truncateText(item.email, 10)}
+          </Tooltip>
         </div>
         <div className="flex items-center justify-center py-3">
           {item.phoneNumber}
