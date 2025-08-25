@@ -39,7 +39,7 @@ const OwnerTableHead = ({ columns }) => {
 
   return (
     <div className="overflow-x-auto">
-      <div className=" w-full bg-transparent rounded-lg shadow-md space-y-3">
+      <div className="min-w-[1200px] w-full bg-transparent rounded-lg shadow-md space-y-3">
         {/* Filter Section */}
         <div className="flex justify-end">
           <div className='w-10/12'>

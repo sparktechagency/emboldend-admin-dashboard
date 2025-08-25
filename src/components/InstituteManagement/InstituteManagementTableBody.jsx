@@ -3,15 +3,20 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { BiChevronDown, BiChevronUp } from 'react-icons/bi';
 import { IoCloseOutline } from 'react-icons/io5';
+import { useMediaQuery } from 'react-responsive';
 import { useNavigate } from 'react-router-dom';
 import { useUpdateStatusWithInstituteMutation } from '../../features/instituteManagement/instituteManagementApi';
 
-const InstituteManagementTableBody = ({ item, refetch }) => {
+const InstituteManagementTableBody = ({list , item, refetch }) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [statusName, setStatusName] = useState(item?.status === 'ACTIVE' ? 'Active' : 'Inactive');
   const navigate = useNavigate();
   const [updateStatus, { isLoading }] = useUpdateStatusWithInstituteMutation();
+
+  // Media query hooks to detect device type
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+  const isDesktop = useMediaQuery({ minWidth: 768 });
 
   const showViewModal = () => setIsViewModalOpen(true);
   const handleModalClose = () => setIsViewModalOpen(false);
@@ -27,8 +32,6 @@ const InstituteManagementTableBody = ({ item, refetch }) => {
         id: item._id,
         data: { status: newStatus }
       }).unwrap();
-
-
 
       if (response) {
         setStatusName(newStatus === 'ACTIVE' ? 'Active' : 'Inactive');
@@ -62,7 +65,7 @@ const InstituteManagementTableBody = ({ item, refetch }) => {
     <>
       {/* Table Row */}
       <div className="grid items-center grid-cols-11 gap-2 px-2 my-3 text-sm bg-gray-100 rounded-lg whitespace-nowrap">
-        <div className="flex items-center justify-center py-3">{tableItem.id.slice(-6)}</div>
+        <div className="flex items-center justify-center py-3">{list}</div>
         <div className="flex items-center justify-center py-3">
           <Tooltip placement="topLeft" title={tableItem.ownerName}>
             {tableItem.ownerName.length > 10 ? `${tableItem.ownerName.substring(0, 10)}...` : tableItem.ownerName}
@@ -70,8 +73,8 @@ const InstituteManagementTableBody = ({ item, refetch }) => {
         </div>
 
         <div className="flex items-center justify-center py-3"> <Tooltip placement="topLeft" title={tableItem.email}>
-            {tableItem.email.length > 10 ? `${tableItem.email.substring(0, 10)}...` : tableItem.email}
-          </Tooltip></div>
+          {tableItem.email.length > 10 ? `${tableItem.email.substring(0, 10)}...` : tableItem.email}
+        </Tooltip></div>
         <div className="flex items-center justify-center py-3">{tableItem.phoneNumber}</div>
         <div className="flex items-center justify-center py-3">{tableItem.totalInstitute}</div>
         <div className="flex items-center justify-center py-3">{tableItem.totalAppUser}</div>
@@ -97,14 +100,15 @@ const InstituteManagementTableBody = ({ item, refetch }) => {
           </span>
         </div>
 
-        <div className="flex items-center justify-center col-span-2 gap-2 px-1.5 py-1 border rounded border-SurfacePrimary">
+        <div className="flex items-center justify-center col-span-2 gap-2 sm:px-1.5  py-1 border rounded border-SurfacePrimary">
+          {/* Conditionally render button text based on device */}
           <button
             onClick={() => navigate(`/institute-management/owner-details/${tableItem.id}`)}
-            className="w-full p-2 text-white transition duration-200 rounded bg-primary hover:bg-primary-dark"
+            className="w-auto p-2 text-white transition duration-200 rounded bg-primary hover:bg-primary-dark"
           >
-            View Details
+            {isMobile ? "View De..." : "View Details"}
           </button>
-          <div className="w-full">
+          <div className="sm:w-auto ">
             <Dropdown
               open={dropdownOpen}
               onOpenChange={setDropdownOpen}

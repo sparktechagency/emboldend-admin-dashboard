@@ -13,7 +13,7 @@ import {
 import { useGetProfileQuery } from '../features/settings/settingApi';
 import { baseURL } from "../utils/BaseURL";
 
-const NotificationPopup = () => {
+const Navber = ({ toggleSidebar }) => {
   const path = useLocation();
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
@@ -21,10 +21,9 @@ const NotificationPopup = () => {
   const socketRef = useRef(null);
   const popupRef = useRef(null);
   const iconRef = useRef(null);
-  const [searchValue, setSearchValue] = useState(""); // Add state for search value
+  const [searchValue, setSearchValue] = useState("");
 
   const { data: profile } = useGetProfileQuery();
-
 
   const { data: notifications, refetch, isLoading } = useGetNotificationQuery(undefined, {
     refetchOnFocus: true,
@@ -32,19 +31,17 @@ const NotificationPopup = () => {
   });
 
   const [readNotification, { isLoading: updateLoading }] = useReadNotificationMutation();
+  const [readAllNotifications] = useReadNotificationMutation();
 
   // Clear search on page reload/mount
   useEffect(() => {
-    // Clear search value and URL parameters on component mount (page reload)
     setSearchValue("");
     if (path.search && (path.pathname === "/institute-management" || path.pathname === "/earning")) {
-      // Clear the search query from URL on page reload
       navigate(path.pathname, { replace: true });
     }
-  }, []); // Empty dependency array means this runs only on mount
+  }, []);
 
   useEffect(() => {
-    // Clear search value when path changes (but not search params)
     setSearchValue("");
   }, [path.pathname]);
 
@@ -52,9 +49,11 @@ const NotificationPopup = () => {
     socketRef.current = io(baseURL);
 
     socketRef.current.on("connect", () => {
+      console.log("Connected to notification server");
     });
 
     const handleNewNotification = (notification) => {
+      console.log("New notification received:", notification);
       refetch();
     };
 
@@ -95,10 +94,9 @@ const NotificationPopup = () => {
 
   const handleSearch = (e) => {
     const value = e.target.value;
-    setSearchValue(value); // Update the search value state
+    setSearchValue(value);
 
     if (value === "") {
-      // When input is cleared, remove the search query from URL
       if (path.pathname === "/institute-management") {
         navigate("/institute-management");
       } else if (path.pathname === "/earning") {
@@ -117,25 +115,22 @@ const NotificationPopup = () => {
   const handleNotificationClick = async (notification) => {
     try {
       if (!notification.read) {
-        await readNotification(notification._id);
+        await readNotification(notification._id).unwrap();
       }
-      refetch();
+      // setVisible(false);
     } catch (error) {
-      // console.error("Error updating notification:", error);
+      console.error("Error updating notification:", error);
     }
   };
 
-  // Function to handle See Details button click
   const handleSeeDetailsClick = () => {
-    setVisible(false); // Close the modal
-    navigate("/notification"); // Navigate to notification settings
+    setVisible(false);
+    navigate("/notification");
   };
 
   const formatTime = (timestamp) => {
     if (!timestamp) return "Just now";
-
     const bangladeshTime = moment(timestamp).add(6, 'hours');
-
     return bangladeshTime.fromNow();
   };
 
@@ -152,30 +147,37 @@ const NotificationPopup = () => {
     }
   };
 
-  const unreadCount = notifications?.data?.result.filter(notif => !notif.read).length || 0;
+  const unreadCount = notifications?.data?.filter(notif => !notif.read).length || 0;
 
   const markAllAsRead = async () => {
     try {
-      await Promise.all(notifications.data.result.map(notif => readNotification(notif._id)));
-      refetch();
+      await readAllNotifications().unwrap();
     } catch (error) {
       console.error("Error marking all as read:", error);
     }
   };
 
-  const getNotification = [
-
-  ]
-
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between w-full px-4 py-3 bg-white shadow-sm lg:px-6">
+      <div className="flex items-center lg:hidden">
+        <button
+          onClick={toggleSidebar}
+          className="p-2 mr-2 text-gray-600 rounded-md hover:bg-gray-100 focus:outline-none"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+
       {path.pathname === "/institute-management" || path.pathname === "/earning" ? (
-        <div className="flex items-center justify-between w-7/12">
+        <div className="flex-1 mx-2 md:mx-4 lg:flex lg:items-center lg:justify-between lg:w-7/12">
           <Input
             size="large"
             onChange={handleSearch}
-            value={searchValue} // Add value prop to control the input
+            value={searchValue}
             placeholder="Please Input your Order Number"
+            className="w-full"
             style={{
               borderColor: "#336C79",
               color: "#333",
@@ -186,19 +188,19 @@ const NotificationPopup = () => {
           />
         </div>
       ) : (
-        <div className="flex items-center justify-between w-7/12"></div>
+        <div className="flex-1 lg:flex lg:items-center lg:justify-between lg:w-7/12"></div>
       )}
 
-      <div className="relative z-40 flex items-center justify-end gap-5 px-5">
+      <div className="relative z-40 flex items-center justify-end gap-3 md:gap-5">
         <div
           onClick={() => navigate("/settings")}
-          className="cursor-pointer"
+          className="cursor-pointer hidden sm:flex items-center"
         >
-          <span className="mr-2 text-gray-700">
-            Hello, <b>{profile?.data?.name || "Hello, Sabbir"}</b>
+          <span className="mr-2 text-gray-700 hidden md:inline">
+            Hello, <b>{profile?.data?.name || "User"}</b>
           </span>
           <Avatar
-            src={profile?.data?.profileImage ? `${baseURL}${profile?.data?.profileImage}` : `${"https://i.ibb.co.com/QF3711qv/Frame-2147226793.png"}`}
+            src={profile?.data?.profileImage ? `${baseURL}${profile?.data?.profileImage}` : "https://i.ibb.co.com/QF3711qv/Frame-2147226793.png"}
             size={30}
           />
         </div>
@@ -214,7 +216,7 @@ const NotificationPopup = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
-            className="absolute overflow-hidden bg-white border border-gray-200 shadow-xl right-4 top-12 w-96 rounded-xl"
+            className="absolute overflow-hidden bg-white border border-gray-200 shadow-xl right-0 top-12 w-80 sm:w-96 rounded-xl"
           >
             <Card
               title="Notifications"
@@ -232,19 +234,18 @@ const NotificationPopup = () => {
                   <div className="flex justify-center py-4">
                     <Spin size="small" />
                   </div>
-                ) : getNotification.length === 0 ? (
-                  <div className="text-center  text-gray-500">
+                ) : !notifications?.data || notifications.data.length === 0 ? (
+                  <div className="text-center text-gray-500">
                     <div className="flex justify-center">
                       <img
                         src={"/images/notification.png"}
                         width={200}
                         height={200}
-
                         alt="Notification Icon"
                       />
                     </div>
                     <h3 className="font-bold text-lg leading-[26px] pb-[5px]">
-                      There`s no notifications
+                      There's no notifications
                     </h3>
                     <p className="pb-[5px]">
                       Your notifications will appear on this page.
@@ -254,13 +255,12 @@ const NotificationPopup = () => {
                       type="primary"
                       className="w-full"
                       size="middle"
-
                     >
-                      See details
+                      See More
                     </Button>
                   </div>
                 ) : (
-                  getNotification.map((notif, index) => (
+                  notifications.data.slice(0, 5).map((notif, index) => (
                     <div
                       key={notif._id || index}
                       className={`flex items-start p-3 transition duration-300 border-b border-gray-100 hover:bg-gray-50 ${!notif.read ? "bg-blue-50" : ""
@@ -269,22 +269,22 @@ const NotificationPopup = () => {
                     >
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
-                          {notif.showAlert && notif.type && (
-                            <Tag color={getTypeColor(notif.type)}>
-                              {notif.type}
-                            </Tag>
-                          )}
+                          <Tag color={getTypeColor(notif.type)}>
+                            {notif.type}
+                          </Tag>
                           <span className="ml-auto text-xs text-gray-500">
                             {formatTime(notif.createdAt)}
                           </span>
                         </div>
+                        <h4 className={`text-sm font-medium ${!notif.read ? "text-blue-800" : "text-gray-800"}`}>
+                          {notif.title}
+                        </h4>
                         <p
-                          className={`text-sm ${!notif.read ? "font-medium" : "text-gray-600"
-                            }`}
+                          className={`text-sm mt-1 ${!notif.read ? "font-medium" : "text-gray-600"}`}
                         >
-                          {notif.text}
+                          {notif.message}
                         </p>
-                        {notif.read && !notif.showAlert && (
+                        {notif.read && (
                           <div className="flex items-center mt-1 text-xs text-gray-500">
                             <CheckCircleOutlined className="mr-1" /> Read
                           </div>
@@ -292,6 +292,13 @@ const NotificationPopup = () => {
                       </div>
                     </div>
                   ))
+                )}
+                {notifications?.data && notifications.data.length > 5 && (
+                  <div className="p-3 text-center border-t border-gray-100">
+                    <Button type="primary" onClick={handleSeeDetailsClick}>
+                      View All Notifications
+                    </Button>
+                  </div>
                 )}
               </div>
             </Card>
@@ -302,4 +309,4 @@ const NotificationPopup = () => {
   );
 };
 
-export default NotificationPopup;
+export default Navber;

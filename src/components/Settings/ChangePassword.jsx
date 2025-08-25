@@ -1,12 +1,9 @@
 import { Button, Form, Input, message } from "antd";
 import { useChangePasswordMutation } from '../../features/settings/settingApi';
-// import toast from "react-hot-toast";
-
 
 const ChangePassword = () => {
   const [form] = Form.useForm();
   const [changePassword, { isLoading }] = useChangePasswordMutation();
-
 
   const handleChangePassword = async (values) => {
     try {
@@ -18,7 +15,7 @@ const ChangePassword = () => {
 
       // Validate new password and confirm password match
       if (trimmedValues.newPassword !== trimmedValues.confirmPassword) {
-        toast.error("New password and confirm password do not match");
+        message.error("New password and confirm password do not match");
         return;
       }
 
@@ -31,7 +28,7 @@ const ChangePassword = () => {
       // Connect to API to update the password
       const result = await changePassword(trimmedValues).unwrap();
 
-      console.log(result)
+      console.log(result);
 
       // Show success message and reset form
       message.success("Password updated successfully!");
@@ -60,57 +57,80 @@ const ChangePassword = () => {
   ];
 
   return (
-    <div className="max-w-2xl p-4">
-      <h2 className="text-2xl font-bold mb-6">Change Password</h2>
+    <div className="w-full max-w-md sm:max-w-lg lg:max-w-2xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
+      {/* Header */}
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-2">
+          Change Password
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600">
+          Update your password to keep your account secure
+        </p>
+      </div>
+
+      {/* Form */}
       <Form
         form={form}
         layout="vertical"
         initialValues={{ remember: true }}
         onFinish={handleChangePassword}
+        className="space-y-4"
       >
         {/* Current Password */}
         <Form.Item
           name="currentPassword"
-          label="Current Password"
+          label={
+            <span className="text-sm sm:text-base font-medium text-gray-700">
+              Current Password
+            </span>
+          }
           rules={[
             { required: true, message: "Please input your current password!" },
           ]}
-          className="mb-6"
+          className="mb-4 sm:mb-6"
         >
           <Input.Password
             placeholder="Enter current password"
+            className="h-10 sm:h-12 rounded-lg border-gray-300 text-sm sm:text-base"
             style={{
               border: "1px solid #E0E4EC",
-              height: "52px",
               borderRadius: "8px",
             }}
-          // disabled={isLoading}
+            disabled={isLoading}
           />
         </Form.Item>
 
         {/* New Password */}
         <Form.Item
           name="newPassword"
-          label="New Password"
+          label={
+            <span className="text-sm sm:text-base font-medium text-gray-700">
+              New Password
+            </span>
+          }
           rules={passwordRules}
-          className="mb-6"
+          className="mb-4 sm:mb-6"
           hasFeedback
         >
           <Input.Password
             placeholder="Enter new password"
+            className="h-10 sm:h-12 rounded-lg border-gray-300 text-sm sm:text-base"
             style={{
               border: "1px solid #E0E4EC",
-              height: "52px",
               borderRadius: "8px",
             }}
-          // disabled={isLoading}
+            disabled={isLoading}
           />
         </Form.Item>
 
         {/* Confirm Password */}
         <Form.Item
           name="confirmPassword"
-          label="Confirm New Password"
+          label={
+            <span className="text-sm sm:text-base font-medium text-gray-700">
+              Confirm New Password
+            </span>
+          }
           dependencies={['newPassword']}
           hasFeedback
           rules={[
@@ -126,28 +146,42 @@ const ChangePassword = () => {
               },
             }),
           ]}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
           <Input.Password
             placeholder="Confirm new password"
+            className="h-10 sm:h-12 rounded-lg border-gray-300 text-sm sm:text-base"
             style={{
               border: "1px solid #E0E4EC",
-              height: "52px",
               borderRadius: "8px",
             }}
-          // disabled={isLoading}
+            disabled={isLoading}
           />
         </Form.Item>
 
+        {/* Password Requirements Info */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8">
+          <h4 className="text-sm sm:text-base font-medium text-blue-800 mb-2">
+            Password Requirements:
+          </h4>
+          <ul className="text-xs sm:text-sm text-blue-700 space-y-1">
+            <li>• At least 8 characters long</li>
+            <li>• Contains uppercase and lowercase letters</li>
+            <li>• Contains at least one number</li>
+            <li>• Contains at least one special character (@$!%*?&)</li>
+          </ul>
+        </div>
+
         {/* Submit Button */}
-        <Form.Item>
+        <Form.Item className="mb-0">
           <Button
             type="primary"
             htmlType="submit"
-            // loading={isLoading}
-            className="w-full"
+            loading={isLoading}
+            className="w-full h-10 sm:h-12 text-sm sm:text-base font-medium rounded-lg"
+            disabled={isLoading}
           >
-            {"Update Password"}
+            {isLoading ? "Updating..." : "Update Password"}
           </Button>
         </Form.Item>
       </Form>

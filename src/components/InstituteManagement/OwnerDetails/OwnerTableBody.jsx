@@ -1,4 +1,4 @@
-import { Card, Dropdown, Radio } from "antd";
+import { Card, Dropdown, Radio, Tooltip } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
@@ -63,8 +63,21 @@ const InstituteTableBody = ({ item }) => {
         <div className="flex items-center justify-center py-3">
           {item.instituteName.split(' ').slice(0, 2).join(' ')}
         </div>
-        <div className="flex items-center justify-center py-3">{item.location}</div>
-        <div className="flex items-center justify-center py-3">{item.email}</div>
+        {/* <div className="flex items-center justify-center py-3">{item.location}</div> */}
+
+        <div className="flex items-center justify-center py-3">
+          <Tooltip placement="topLeft" title={item.location}>
+            {item.location.length > 10 ? `${item.location.substring(0, 10)}...` : item.location}
+          </Tooltip>
+        </div>
+
+        <div className="flex items-center justify-center py-3">
+          <Tooltip placement="topLeft" title={item.email}>
+            {item.email.length > 10 ? `${item.email.substring(0, 10)}...` : item.email}
+          </Tooltip>
+        </div>
+
+
         <div className="flex items-center justify-center py-3">{item.appUser}</div>
         <div className="flex items-center justify-center py-3">{item.phoneNumber}</div>
         <div className="flex items-center justify-center py-3">{item.created}</div>

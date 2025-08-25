@@ -1,3 +1,4 @@
+// src/components/Sidebar.jsx
 import { Button, Modal } from "antd";
 import { AnimatePresence, motion } from "framer-motion"; // Import Framer Motion
 import { useEffect, useState } from "react"; // Import useEffect
@@ -7,7 +8,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { menuDatas } from "../constants/menuDatas";
 import { logout } from "../features/auth/authSlice";
 
-const Sidebar = () => {
+const Sidebar = ({ closeSidebar }) => {
   const location = useLocation();
   const router = useNavigate();
   const dispatch = useDispatch();
@@ -63,7 +64,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-[300px] border-r border-r-primary h-screen overflow-y-auto custom-scrollbar2">
+    <div className="w-full border-r border-r-primary h-screen overflow-y-auto custom-scrollbar2">
       <div className="h-[200px] border-b flex flex-col justify-center items-center gap-3 border-b-primary">
         <div className="flex items-center justify-center">
           <img
@@ -102,7 +103,12 @@ const Sidebar = () => {
                   className={`flex items-center gap-3 text-sm py-3 font-semibold 
                     ${isActive && "active"} 
                     rounded-s-xl p-2`}
-                  onClick={() => toggleSubMenu(index)}
+                  onClick={() => {
+                    toggleSubMenu(index);
+                    if (window.innerWidth < 1024) {
+                      closeSidebar();
+                    }
+                  }}
                 >
                   <span className="pl-2 text-2xl">
                     <img
@@ -134,11 +140,15 @@ const Sidebar = () => {
                           <Link
                             to={subLink.link}
                             className={`flex items-center gap-3 text-sm py-2 font-semibold 
-                              ${
-                                location.pathname === subLink.link &&
-                                "activesub"
+                              ${location.pathname === subLink.link &&
+                              "activesub"
                               } 
                               rounded-s-lg p-2`}
+                            onClick={() => {
+                              if (window.innerWidth < 1024) {
+                                closeSidebar();
+                              }
+                            }}
                           >
                             <span className="pl-2 text-2xl">
                               <img
@@ -173,7 +183,7 @@ const Sidebar = () => {
       </div>
 
       {/* Logout Confirmation Modal */}
-     <Modal
+      <Modal
         open={isLogoutModalVisible}
         onOk={handleLogoutOk}
         centered

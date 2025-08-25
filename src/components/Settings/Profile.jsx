@@ -23,7 +23,6 @@ const Profile = () => {
     "https://i.ibb.co.com/fYrFP06M/images-1.png"
   );
 
-
   // Set initial values when profile data is loaded
   useEffect(() => {
     if (profileData?.data) {
@@ -100,86 +99,122 @@ const Profile = () => {
   };
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-32 sm:h-64">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col items-start justify-center pt-5">
-      <div className="rounded-xl w-full max-w-[800px]">
-        <div className="flex items-end justify-between space-x-4">
-          <div className="flex items-center gap-3">
-            <div className="w-[140px] h-[140px] rounded-full border-2 border-primary mx-auto flex flex-col items-center relative">
-              <div className="w-full h-full rounded-full">
+    <div className="flex flex-col items-center lg:items-start justify-center pt-2 sm:pt-5 px-2 sm:px-4">
+      <div className="rounded-xl w-full max-w-4xl">
+        {/* Header Section - Profile Image and Name */}
+        <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
+          {/* Profile Image and Name */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-center sm:text-left">
+            {/* Profile Image */}
+            <div className="relative">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 rounded-full border-2 border-primary mx-auto relative">
                 <img
                   src={previewImage}
                   alt="Profile"
                   className="object-cover w-full h-full rounded-full"
                 />
+
+                {isEditing && (
+                  <div className="absolute flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 p-1 sm:p-2 rounded-full cursor-pointer bg-[#FF991C] -bottom-1 -right-1 sm:bottom-1 sm:right-2">
+                    <Upload showUploadList={false} onChange={handleFileChange}>
+                      <MdEdit className="text-sm sm:text-xl text-white" />
+                    </Upload>
+                  </div>
+                )}
               </div>
-
-              {isEditing && (
-                <div className="absolute flex items-center justify-center w-8 h-8 p-2 text-center rounded-full cursor-pointer bg-[#FF991C] bottom-1 right-5">
-                  <Upload showUploadList={false} onChange={handleFileChange}>
-                    <MdEdit className="mt-1 text-xl text-white" />
-                  </Upload>
-                </div>
-              )}
             </div>
-            <h2 className="text-4xl font-semibold text-gray-800">
-              {profile.name}
-            </h2>
+
+            {/* Name */}
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl sm:text-2xl lg:text-4xl font-semibold text-gray-800 break-words">
+                {profile.name || "User Name"}
+              </h2>
+            </div>
           </div>
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            className="mt-2 border border-primary w-[150px]"
-            onClick={() => setIsEditing(!isEditing)}
-          >
-            {isEditing ? "Cancel" : "Edit Profile"}
-          </Button>
+
+          {/* Edit Button */}
+          <div className="w-full sm:w-auto">
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              className="border border-primary w-full sm:w-auto min-w-[120px] sm:min-w-[150px] h-9 sm:h-10"
+              onClick={() => setIsEditing(!isEditing)}
+            >
+              <span className="text-sm sm:text-base">
+                {isEditing ? "Cancel" : "Edit Profile"}
+              </span>
+            </Button>
+          </div>
         </div>
 
-        <div className="mt-6 space-y-4">
-          <label className="block text-gray-600">Full Name</label>
-          <Input
-            name="name"
-            value={profile.name}
-            onChange={handleChange}
-            disabled={!isEditing}
-            className="border rounded-lg border-primary p-2 h-[44px]"
-          />
+        {/* Form Fields */}
+        <div className="space-y-4 sm:space-y-6">
+          {/* Full Name */}
+          <div>
+            <label className="block text-sm sm:text-base text-gray-600 mb-2">
+              Full Name
+            </label>
+            <Input
+              name="name"
+              value={profile.name}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className="border rounded-lg border-primary h-10 sm:h-12 text-sm sm:text-base"
+              placeholder="Enter your full name"
+            />
+          </div>
 
-          <label className="block text-gray-600">Email</label>
-          <Input
-            name="email"
-            type="email"
-            readOnly
-            value={profile.email}
-            disabled
-            className="border rounded-lg border-primary p-2 h-[44px]"
-          />
+          {/* Email */}
+          <div>
+            <label className="block text-sm sm:text-base text-gray-600 mb-2">
+              Email
+            </label>
+            <Input
+              name="email"
+              type="email"
+              readOnly
+              value={profile.email}
+              disabled
+              className="border rounded-lg border-primary h-10 sm:h-12 text-sm sm:text-base bg-gray-50"
+              placeholder="email@example.com"
+            />
+          </div>
 
-          <label className="block text-gray-600">Contact Number</label>
-          <Input
-            name="phone"
-            value={profile.phone}
-            onChange={handleChange}
-            disabled={isPhoneReadOnly || !isEditing}
-            className="border rounded-lg border-primary p-2 h-[44px]"
-            placeholder="Enter your phone number"
-          />
+          {/* Contact Number */}
+          <div>
+            <label className="block text-sm sm:text-base text-gray-600 mb-2">
+              Contact Number
+            </label>
+            <Input
+              name="phone"
+              value={profile.phone}
+              onChange={handleChange}
+              disabled={isPhoneReadOnly || !isEditing}
+              className="border rounded-lg border-primary h-10 sm:h-12 text-sm sm:text-base"
+              placeholder="Enter your phone number"
+            />
+          </div>
         </div>
 
+        {/* Save Button */}
         {isEditing && (
-          <div className="flex justify-end">
+          <div className="flex justify-center sm:justify-end mt-6 sm:mt-8">
             <Button
               type="primary"
               loading={updateProfileLoading}
               icon={<SaveOutlined />}
-              className="mt-6 w-[200px] bg-primary"
+              className="bg-primary w-full sm:w-auto min-w-[160px] sm:min-w-[200px] h-10 sm:h-12 text-sm sm:text-base"
               onClick={handleSave}
             >
-              Save
+              Save Changes
             </Button>
           </div>
         )}

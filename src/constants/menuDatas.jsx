@@ -9,16 +9,13 @@ export const menuDatas = [
     title: "Institute Management",
     link: "/institute-management",
   },
-  // {
-  //   icon: "/icons/park_management.png",
-  //   title: "parking Spot Management",
-  //   link: "/parking-management",
-  // },
   {
     icon: "/icons/sidebar/earning.png",
     title: "Total Earning",
     link: "/earning",
   },
+
+
   {
     icon: "/icons/sidebar/subcription.png",
     title: "Subscription Management",
@@ -39,6 +36,14 @@ export const menuDatas = [
     title: "Privacy Policy",
     link: "/privacy-policy",
   },
+
+  {
+    icon: "/icons/sidebar/notification.png",
+    title: "Push Notification",
+    link: "/push-notification",
+  },
+
+
   {
     icon: "/icons/sidebar/settings.png",
     title: "Settings",

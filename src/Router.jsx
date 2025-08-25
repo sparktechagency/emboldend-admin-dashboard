@@ -16,7 +16,7 @@ import Earning from "./pages/earning/Earning";
 import NotFound from "./pages/NotFound";
 import Notification from "./pages/Notification";
 import ParkingManagement from "./pages/ParkingManagement/ParkingManagement";
-import PrivacyPolicy from "./pages/privacyPolicy";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import UserManagement from "./pages/UserManagement/UserManagement";
 import UserProfile from "./pages/UserProfile";
