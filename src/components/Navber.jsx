@@ -293,7 +293,7 @@ const Navber = ({ toggleSidebar }) => {
                     </div>
                   ))
                 )}
-                {notifications?.data && notifications.data.length > 5 && (
+                {notifications?.data && (
                   <div className="p-3 text-center border-t border-gray-100">
                     <Button type="primary" onClick={handleSeeDetailsClick}>
                       View All Notifications

@@ -6,14 +6,48 @@ import { useEffect, useState } from 'react';
 import { MdFormatListBulleted } from "react-icons/md";
 import { VscListOrdered } from "react-icons/vsc";
 import { useGetBussinessOwnerQuery, useSendNotificationMutation } from '../../features/notification/notification';
+import { io } from 'socket.io-client';
+import { baseURL } from '../../utils/BaseURL';
 
 export default function PushNotification() {
   const [title, setTitle] = useState('');
   const [businessOwner, setBusinessOwner] = useState(undefined);
   const [content, setContent] = useState('');
   const [mounted, setMounted] = useState(false);
+  const [socket, setSocket] = useState(null);
+  
   const { data: getBusinessOwner, isLoading: loadingBusinessOwner } = useGetBussinessOwnerQuery({ limit: 10000 });
   const [PushNotification, { isLoading: PushNotificationLoading }] = useSendNotificationMutation();
+
+  // Socket connection setup
+  useEffect(() => {
+    // Initialize socket connection
+    const socketInstance = io(baseURL, {
+      transports: ['websocket'],
+      autoConnect: true,
+    });
+
+    socketInstance.on('connect', () => {
+      console.log('Connected to socket server:', socketInstance.id);
+    });
+
+    socketInstance.on('disconnect', () => {
+      console.log('Disconnected from socket server');
+    });
+
+    socketInstance.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+    });
+
+    setSocket(socketInstance);
+
+    // Cleanup on component unmount
+    return () => {
+      if (socketInstance) {
+        socketInstance.disconnect();
+      }
+    };
+  }, []);
 
   // Create business owner options with "All" option at the top
   const businessOwnerOptions = [
@@ -71,12 +105,20 @@ export default function PushNotification() {
 
   const handleSend = async () => {
     let notificationData;
+    let socketData;
 
     if (businessOwner === 'all') {
       // Send to all business owners - no receiver field needed
       notificationData = {
         title: title,
         message: content
+      };
+      
+      // Socket data for all users (no receiver ID)
+      socketData = {
+        title: title,
+        message: content,
+        timestamp: new Date().toISOString()
       };
     } else {
       // Send to specific business owner
@@ -85,25 +127,47 @@ export default function PushNotification() {
         message: content,
         receiver: businessOwner
       };
+
+      // Socket data for specific user
+      socketData = {
+        title: title,
+        message: content,
+        receiver: businessOwner,
+        timestamp: new Date().toISOString()
+      };
     }
+
     try {
+      // Send notification via API
       const response = await PushNotification(notificationData).unwrap();
-      message.success(response.message)
+      message.success(response.message);
+
+      // Emit socket event for real-time notification
+      if (socket && socket.connected) {
+        socket.emit('notification', socketData);
+        console.log('Socket notification sent:', socketData);
+      } else {
+        console.warn('Socket not connected, notification sent via API only');
+      }
+
+      // Reset form
       setTitle('');
       setBusinessOwner(undefined);
       setContent('');
       editor?.commands.clearContent();
+      
     } catch (error) {
-      console.log(error.data.message)
+      console.log('API Error:', error.data?.message || error.message);
+      message.error(error.data?.message || 'Failed to send notification');
     }
-    // Here you would typically make an API call to send the notification
-    // Example:
-    // sendPushNotification(notificationData);
   };
 
   return (
     <div className="bg-white flex flex-col gap-4 md:gap-5 border mt-4 md:mt-10 rounded-lg p-4 md:p-6 shadow-sm w-full max-w-6xl mx-auto">
-      <h1 className="text-lg md:text-xl font-semibold mb-4 md:mb-6">Send Push Notification</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-lg md:text-xl font-semibold mb-4 md:mb-6">Send Push Notification</h1>
+        
+      </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4">
         <label className="block font-medium w-full sm:w-24">Title</label>
