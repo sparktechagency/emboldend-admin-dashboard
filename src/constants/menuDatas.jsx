@@ -18,7 +18,7 @@ export const menuDatas = [
 
   {
     icon: "/icons/sidebar/subcription.png",
-    title: "Subscription Management",
+    title: "Subscription",
     link: "/subscription",
   },
   // {

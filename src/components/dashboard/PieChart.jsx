@@ -1,8 +1,7 @@
 import { Card, Select, Spin } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
-import React, { Suspense, useState } from "react";
+import { Suspense, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { usePieChartAnalysisQuery } from "../../features/dashboard/dashboardApi";
 
 const colorMapping = {
   "Total Food Sell": { filled: "#FF5B5B", remaining: "#f88484" },
@@ -53,18 +52,18 @@ const PieChartComponent = ({ item }) => {
 };
 
 
-const piedata =  [
+const piedata = [
   {
-      "name": "Total Food Sell",
-      "value": 8
+    "name": "Total Food Sell",
+    "value": 8
   },
   {
-      "name": "Customer Growth",
-      "value": 96.77
+    "name": "Customer Growth",
+    "value": 96.77
   },
   {
-      "name": "Total Revenue",
-      "value": 12
+    "name": "Total Revenue",
+    "value": 12
   }
 ]
 
@@ -72,7 +71,6 @@ const PieCharts = () => {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
-  const { data, error, isLoading } = usePieChartAnalysisQuery(year , {refetchOnFocus:true, refetchOnReconnect:true} );
 
   const handleYearChange = (value) => setYear(value);
 
@@ -95,9 +93,9 @@ const PieCharts = () => {
         }
       >
         <div className="pie-chart-container-wrapper">
-          { isLoading ? (
-            <Suspense fallback={<Spin/>}>
-              <Spin/>
+          {isLoading ? (
+            <Suspense fallback={<Spin />}>
+              <Spin />
             </Suspense>
           ) : (
             <AnimatePresence>

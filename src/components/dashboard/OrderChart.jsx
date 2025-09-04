@@ -8,7 +8,6 @@ import {
   Tooltip,
   XAxis,
 } from "recharts";
-import { useOrderChartAnalysisQuery } from "../../features/dashboard/dashboardApi";
 
 // Custom Tooltip Component
 const CustomTooltip = ({ active, payload, label }) => {
@@ -25,52 +24,43 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const OrderChart = () => {
   const [selectedWeek, setSelectedWeek] = useState("Weekly");
-  const {
-    data: orderChart,
-    error: queryError,
-    isLoading: queryLoading,
-  } = useOrderChartAnalysisQuery(undefined, {
-    refetchOnFocus: true,
-    refetchOnReconnect: true,
-  });
 
-  
 
   const handleWeekChange = (value) => {
     setSelectedWeek(value);
   };
 
 
-  const parkingData =  [
+  const parkingData = [
     {
-        "day": "Sunday",
-        "totalOrders": 0
+      "day": "Sunday",
+      "totalOrders": 0
     },
     {
-        "day": "Monday",
-        "totalOrders": 0
+      "day": "Monday",
+      "totalOrders": 0
     },
     {
-        "day": "Tuesday",
-        "totalOrders": 0
+      "day": "Tuesday",
+      "totalOrders": 0
     },
     {
-        "day": "Wednesday",
-        "totalOrders": 0
+      "day": "Wednesday",
+      "totalOrders": 0
     },
     {
-        "day": "Thursday",
-        "totalOrders": 6
+      "day": "Thursday",
+      "totalOrders": 6
     },
     {
-        "day": "Friday",
-        "totalOrders": 0
+      "day": "Friday",
+      "totalOrders": 0
     },
     {
-        "day": "Saturday",
-        "totalOrders": 0
+      "day": "Saturday",
+      "totalOrders": 0
     }
-]
+  ]
 
   return (
     <section className="w-full rounded-[10px] border border-primary bg-white">

@@ -20,6 +20,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import UserManagement from "./pages/UserManagement/UserManagement";
 import UserProfile from "./pages/UserProfile";
+import ProtectedRoute from './components/ProtectedRoute';
 
 const Routers = () => {
   return (
@@ -40,8 +41,8 @@ const Routers = () => {
         <Route
           path="/"
           element={
-            // <ProtectedRoute>
-            <Layout />
+            <ProtectedRoute>
+              <Layout />
             //  </ProtectedRoute>
           }
         >
