@@ -7,6 +7,6 @@ export default defineConfig({
   server: {
     host: "0.0.0.0", // allow access from external IP/domains
     port: 4001,      // your port
-    allowedHosts: ["admin.dutyhourapp.com", "www.admin.dutyhourapp.com"], // 👈 add your domain here
+    allowedHosts: ["admin.dutyhourapp.com", "www.admin.dutyhourapp.com", "www.api.dutyhourapp.com", "api.dutyhourapp.com"], // 👈 add your domain here
   },
 })
